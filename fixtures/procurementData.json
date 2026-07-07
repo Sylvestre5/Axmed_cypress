@@ -1,0 +1,124 @@
+{
+  "demandPools": [
+    {
+      "slug": "oxytocin",
+      "name": "Oxytocin 10 IU/mL",
+      "initialUnits": 7500,
+      "moqUnits": 10000,
+      "unit": "units",
+      "contributionQty": 3000,
+      "expectedStatusAfterContribution": "MOQ Met"
+    },
+    {
+      "slug": "amoxicillin",
+      "name": "Amoxicillin 250mg",
+      "initialUnits": 4200,
+      "moqUnits": 15000,
+      "unit": "units",
+      "contributionQty": 500,
+      "expectedStatusAfterContribution": "Filling"
+    },
+    {
+      "slug": "rotavirus",
+      "name": "Rotavirus Vaccine",
+      "initialUnits": 1800,
+      "moqUnits": 5000,
+      "unit": "doses",
+      "contributionQty": 2500,
+      "expectedStatusAfterContribution": "Near MOQ"
+    }
+  ],
+  "financingFacilities": {
+    "riff": {
+      "label": "RIFF",
+      "initialBalance": 250000
+    },
+    "gates": {
+      "label": "Gates Foundation MNCH Matching Fund",
+      "initialBalance": 50000
+    }
+  },
+  "rfqScenarios": [
+    {
+      "scenarioName": "Gates Foundation 1:1 matching purchase",
+      "poolValue": "rotavirus",
+      "poolLabel": "Rotavirus Vaccine",
+      "unitPrice": 3.1,
+      "quantity": 1000,
+      "financingFacility": "gates",
+      "expectedOrderValue": 3100,
+      "expectedMatchedAmount": 3100,
+      "expectedTotalPurchasingPower": 6200,
+      "expectedGatesBalanceAfter": 46900,
+      "expectedToastFragment": "financed via the Gates Foundation MNCH Matching Fund"
+    },
+    {
+      "scenarioName": "RIFF revolving credit purchase",
+      "poolValue": "amoxicillin",
+      "poolLabel": "Amoxicillin 250mg",
+      "unitPrice": 0.08,
+      "quantity": 5000,
+      "financingFacility": "riff",
+      "expectedOrderValue": 400,
+      "expectedRiffBalanceAfter": 249600,
+      "expectedToastFragment": "financed via the RIFF revolving credit line"
+    },
+    {
+      "scenarioName": "RIFF purchase exceeding available balance",
+      "poolValue": "rotavirus",
+      "poolLabel": "Rotavirus Vaccine",
+      "unitPrice": 3.1,
+      "quantity": 999999,
+      "financingFacility": "riff",
+      "expectedOrderValue": 3099996.9,
+      "expectedToastFragment": "RIFF balance insufficient"
+    }
+  ],
+  "coldChainThresholds": {
+    "stableMinC": 2.0,
+    "stableMaxC": 6.5,
+    "note": "Vaccines/biologics held outside 2.0-6.5C are flagged EXCURSION per Axmed cold-chain SOP"
+  },
+  "shipments": [
+    {
+      "id": "SHP-2291",
+      "medicine": "Oxytocin 10 IU/mL",
+      "temperatureC": 2.4,
+      "expectedTempStatus": "STABLE",
+      "milestone": "In Transit",
+      "nextMilestone": "Customs Clearing",
+      "complianceStatus": "FDA Ghana Approved",
+      "coldChain": true
+    },
+    {
+      "id": "SHP-2288",
+      "medicine": "Rotavirus Vaccine",
+      "temperatureC": 6.8,
+      "expectedTempStatus": "EXCURSION",
+      "milestone": "Customs Clearing",
+      "nextMilestone": "Delivered",
+      "complianceStatus": "Pending FDA Clearance",
+      "coldChain": true
+    },
+    {
+      "id": "SHP-2276",
+      "medicine": "Amoxicillin 250mg",
+      "temperatureC": null,
+      "expectedTempStatus": "N/A",
+      "milestone": "Order Confirmed",
+      "nextMilestone": "In Transit",
+      "complianceStatus": "FDA Ghana Approved",
+      "coldChain": false
+    },
+    {
+      "id": "SHP-2265",
+      "medicine": "Oxytocin 10 IU/mL",
+      "temperatureC": 3.1,
+      "expectedTempStatus": "STABLE",
+      "milestone": "Delivered",
+      "nextMilestone": null,
+      "complianceStatus": "FDA Ghana Approved",
+      "coldChain": true
+    }
+  ]
+}
