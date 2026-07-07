@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Axmed Procurement Hub | Regional Manager Console</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          axteal: { 50:'#eefcfa', 100:'#d3f5f0', 200:'#a8ebe1', 300:'#71dbcc', 400:'#3cc2b0', 500:'#1fa695', 600:'#158578', 700:'#146a62', 800:'#14554f', 900:'#134744' },
+          axnavy: { 50:'#eef2fb', 100:'#d7e0f5', 200:'#b3c4ea', 300:'#829edb', 400:'#5474c8', 500:'#3a54ac', 600:'#2e4290', 700:'#283674', 800:'#252f5f', 900:'#212a4f' }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+  .progress-fill { transition: width 0.5s ease-in-out; }
+  .toast-enter { animation: slideUp .3s ease-out; }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .badge-pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<!-- ============ HEADER ============ -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-40" data-cy="app-header">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-axteal-500 to-axnavy-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">Ax</div>
+      <div>
+        <p class="font-semibold text-slate-900 leading-tight">Axmed Procurement Hub</p>
+        <p class="text-xs text-slate-400 leading-tight">Regional Ops Console &mdash; East Africa</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full" data-cy="system-date">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+        <span id="today-date">Tuesday, 7 July 2026</span>
+      </div>
+      <button class="relative text-slate-400 hover:text-slate-600" data-cy="notifications-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
+      </button>
+      <div class="flex items-center gap-3 pl-4 border-l border-slate-200" data-cy="mock-user-session">
+        <div class="w-9 h-9 rounded-full bg-axnavy-100 text-axnavy-700 flex items-center justify-center font-semibold text-sm">AO</div>
+        <div class="hidden md:block">
+          <p class="text-sm font-medium text-slate-800 leading-tight" data-cy="logged-in-user-name">Amara Okoye</p>
+          <p class="text-xs text-slate-400 leading-tight" data-cy="logged-in-user-role">Regional Procurement Hub Manager</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+
+  <!-- ============ KPI STRIP ============ -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-cy="kpi-strip">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm" data-cy="metric-card-active-pools">
+      <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">Active Demand Pools</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1" data-cy="metric-active-pools-value">3</p>
+      <p class="text-xs text-axteal-600 mt-1">Pooling across 12 facilities</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm" data-cy="metric-card-total-financing">
+      <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">Total Financing Available</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1" data-cy="metric-total-financing-value">$300,000</p>
+      <p class="text-xs text-slate-400 mt-1">RIFF + Gates MNCH Fund</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm" data-cy="metric-card-shipments-transit">
+      <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">Shipments In Transit</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1" data-cy="metric-shipments-transit-value">4</p>
+      <p class="text-xs text-slate-400 mt-1">2 cold-chain sensitive</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm" data-cy="metric-card-margin-cap">
+      <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">Marketplace Margin Cap</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1">10%</p>
+      <p class="text-xs text-slate-400 mt-1">30% profit reinvested locally</p>
+    </div>
+  </section>
+
+  <!-- ============ ROW: DEMAND POOL AGGREGATOR + FINANCING ============ -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Demand Pool Aggregator -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm" data-cy="demand-pool-aggregator-panel">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h2 class="font-semibold text-slate-900">Demand Pool Aggregator</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Pool fragmented orders to hit manufacturer MOQs</p>
+        </div>
+        <span class="text-xs font-medium bg-axteal-50 text-axteal-700 px-2.5 py-1 rounded-full">Aggregated Demand Engine</span>
+      </div>
+
+      <div class="p-5 space-y-5" id="pool-list" data-cy="pool-list-container">
+        <!-- Pool rows injected by JS -->
+      </div>
+    </div>
+
+    <!-- Financing & Credit Line -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm" data-cy="financing-credit-line-panel">
+      <div class="px-5 py-4 border-b border-slate-100">
+        <h2 class="font-semibold text-slate-900">Financing &amp; Credit Line</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Integrated Fintech Solutions</p>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div class="rounded-xl border border-axnavy-100 bg-axnavy-50/50 p-4" data-cy="riff-facility-card">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-axnavy-800">RIFF</p>
+            <span class="text-[10px] font-medium bg-white text-axnavy-600 border border-axnavy-200 px-2 py-0.5 rounded-full">Revolving Line</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Revolving Inventory Financing Facility</p>
+          <p class="text-2xl font-bold text-axnavy-900 mt-2" data-cy="riff-available-balance">$250,000</p>
+          <p class="text-xs text-slate-400">available of $250,000 limit</p>
+          <div class="w-full bg-white rounded-full h-1.5 mt-2 border border-axnavy-100">
+            <div class="bg-axnavy-500 h-1.5 rounded-full progress-fill" id="riff-usage-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-amber-100 bg-amber-50/50 p-4" data-cy="gates-fund-facility-card">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-amber-800">Gates MNCH Fund</p>
+            <span class="text-[10px] font-medium bg-white text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full">1:1 Matching</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Gates Foundation MNCH Matching Fund</p>
+          <p class="text-2xl font-bold text-amber-900 mt-2" data-cy="gates-fund-available-balance">$50,000</p>
+          <p class="text-xs text-slate-400">available of $50,000 pool</p>
+          <div class="w-full bg-white rounded-full h-1.5 mt-2 border border-amber-100">
+            <div class="bg-amber-500 h-1.5 rounded-full progress-fill" id="gates-usage-bar" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ROW: RFQ FORM + RECENT ORDERS ============ -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm" data-cy="rfq-order-form-panel">
+      <div class="px-5 py-4 border-b border-slate-100">
+        <h2 class="font-semibold text-slate-900">Submit RFQ / Purchase Order</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Route your order through a financing facility</p>
+      </div>
+
+      <form class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4" id="rfq-form" data-cy="rfq-form">
+        <div class="sm:col-span-1">
+          <label class="text-xs font-medium text-slate-500">Medicine / Pool</label>
+          <select class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-axteal-400" id="rfq-pool-select" data-cy="rfq-pool-select" required>
+            <option value="" disabled selected>Select a demand pool</option>
+            <option value="oxytocin" data-price="0.42">Oxytocin 10 IU/mL ($0.42/unit)</option>
+            <option value="amoxicillin" data-price="0.08">Amoxicillin 250mg ($0.08/unit)</option>
+            <option value="rotavirus" data-price="3.10">Rotavirus Vaccine ($3.10/unit)</option>
+          </select>
+        </div>
+
+        <div class="sm:col-span-1">
+          <label class="text-xs font-medium text-slate-500">Order Quantity (units)</label>
+          <input type="number" min="1" placeholder="e.g. 1500" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-axteal-400" id="rfq-quantity-input" data-cy="rfq-quantity-input" required />
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="text-xs font-medium text-slate-500">Financing Facility</label>
+          <select class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-axteal-400" id="financing-facility-select" data-cy="financing-facility-select">
+            <option value="none">Self-Funded (No Financing)</option>
+            <option value="riff">RIFF &mdash; Revolving Inventory Financing Facility</option>
+            <option value="gates">Gates Foundation MNCH Matching Fund</option>
+          </select>
+        </div>
+
+        <div class="sm:col-span-2">
+          <p class="text-xs text-slate-400" id="order-value-preview" data-cy="order-value-preview">Order value will be calculated once medicine and quantity are entered.</p>
+          <p class="hidden text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2" id="matching-fund-preview" data-cy="matching-fund-preview"></p>
+          <p class="hidden text-sm font-medium text-axnavy-700 bg-axnavy-50 border border-axnavy-200 rounded-lg px-3 py-2 mt-2" id="riff-preview" data-cy="riff-facility-preview"></p>
+        </div>
+
+        <div class="sm:col-span-2 flex justify-end">
+          <button type="submit" class="bg-axteal-600 hover:bg-axteal-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg shadow-sm transition" data-cy="rfq-submit-btn">Submit Purchase Order</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col" data-cy="recent-orders-panel">
+      <div class="px-5 py-4 border-b border-slate-100">
+        <h2 class="font-semibold text-slate-900">Recent Orders</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Live activity feed</p>
+      </div>
+      <div class="p-5 space-y-3 overflow-y-auto max-h-72" id="recent-orders-list" data-cy="recent-orders-list">
+        <p class="text-xs text-slate-400 italic" data-cy="recent-orders-empty-state">No orders submitted yet this session.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LOGISTICS & COMPLIANCE TRACKER ============ -->
+  <section class="bg-white rounded-2xl border border-slate-200 shadow-sm" data-cy="logistics-compliance-panel">
+    <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div>
+        <h2 class="font-semibold text-slate-900">Logistics &amp; Compliance Tracker</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Cold-chain, customs, and regulatory clearance in real time</p>
+      </div>
+      <span class="text-xs font-medium bg-axnavy-50 text-axnavy-700 px-2.5 py-1 rounded-full">End-to-End Logistics</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm" data-cy="logistics-tracker-table">
+        <thead>
+          <tr class="text-left text-xs text-slate-400 uppercase tracking-wide border-b border-slate-100">
+            <th class="px-5 py-3 font-medium">Shipment</th>
+            <th class="px-5 py-3 font-medium">Cold-Chain Temp</th>
+            <th class="px-5 py-3 font-medium">Milestone</th>
+            <th class="px-5 py-3 font-medium">Regulatory Compliance</th>
+            <th class="px-5 py-3 font-medium">Action</th>
+          </tr>
+        </thead>
+        <tbody id="logistics-tbody" data-cy="logistics-tbody">
+          <!-- Rows injected by JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ SUCCESS TOAST ============ -->
+<div class="fixed bottom-6 right-6 z-50 hidden" id="success-toast" data-cy="operation-success-toast">
+  <div class="toast-enter bg-slate-900 text-white rounded-xl shadow-lg px-4 py-3 flex items-start gap-3 max-w-sm">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-axteal-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+    <p class="text-sm" id="toast-message" data-cy="operation-success-toast-message">Operation completed successfully.</p>
+  </div>
+</div>
+
+<script>
+  // ---------------------------------------------------------------------
+  // MOCK LOGGED-IN STATE (no auth flow — per project constraint)
+  // ---------------------------------------------------------------------
+  const mockSession = {
+    name: 'Amara Okoye',
+    role: 'Regional Procurement Hub Manager',
+    region: 'East Africa'
+  };
+
+  // ---------------------------------------------------------------------
+  // AGGREGATED DEMAND ENGINE — pool state
+  // ---------------------------------------------------------------------
+  const pools = [
+    { id: 'oxytocin',   name: 'Oxytocin 10 IU/mL',   current: 7500, moq: 10000, unit: 'units', slug: 'oxytocin' },
+    { id: 'amoxicillin',name: 'Amoxicillin 250mg',   current: 4200, moq: 15000, unit: 'units', slug: 'amoxicillin' },
+    { id: 'rotavirus',  name: 'Rotavirus Vaccine',   current: 1800, moq: 5000,  unit: 'doses', slug: 'rotavirus' }
+  ];
+
+  function poolStatus(pool) {
+    const pct = pool.current / pool.moq;
+    if (pct >= 1) return { label: 'MOQ Met', classes: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+    if (pct >= 0.85) return { label: 'Near MOQ', classes: 'bg-axteal-50 text-axteal-700 border-axteal-200' };
+    return { label: 'Filling', classes: 'bg-amber-50 text-amber-700 border-amber-200' };
+  }
+
+  function renderPools() {
+    const container = document.getElementById('pool-list');
+    container.innerHTML = '';
+
+    pools.forEach(pool => {
+      const pct = Math.min(100, (pool.current / pool.moq) * 100);
+      const status = poolStatus(pool);
+
+      const row = document.createElement('div');
+      row.className = 'border border-slate-100 rounded-xl p-4';
+      row.setAttribute('data-cy', `pool-card-${pool.slug}`);
+      row.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <p class="font-medium text-slate-800 text-sm" data-cy="pool-name">${pool.name}</p>
+          <span class="text-xs font-medium border px-2 py-0.5 rounded-full ${status.classes}" data-cy="pool-moq-status" data-pool="${pool.slug}">${status.label}</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-2.5">
+          <div class="bg-axteal-500 h-2.5 rounded-full progress-fill" style="width:${pct}%" data-cy="pool-progress-bar" data-pool="${pool.slug}"></div>
+        </div>
+        <div class="flex items-center justify-between mt-1.5">
+          <p class="text-xs text-slate-400" data-cy="pool-progress-text" data-pool="${pool.slug}">${pool.current.toLocaleString()} / ${pool.moq.toLocaleString()} ${pool.unit} filled</p>
+          <p class="text-xs text-slate-400">${pct.toFixed(0)}%</p>
+        </div>
+        <div class="flex items-center gap-2 mt-3">
+          <input type="number" min="1" placeholder="Add units" class="w-32 border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-axteal-400" data-cy="pool-contribution-input" data-pool="${pool.slug}" />
+          <button class="bg-axnavy-600 hover:bg-axnavy-700 text-white text-xs font-medium px-3.5 py-1.5 rounded-lg transition" data-cy="pool-join-btn" data-pool="${pool.slug}">Join Pool</button>
+        </div>
+      `;
+      container.appendChild(row);
+    });
+
+    // wire up join buttons after render
+    container.querySelectorAll('[data-cy="pool-join-btn"]').forEach(btn => {
+      btn.addEventListener('click', () => joinPool(btn.dataset.pool));
+    });
+    container.querySelectorAll('[data-cy="pool-contribution-input"]').forEach(input => {
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); joinPool(input.dataset.pool); } });
+    });
+  }
+
+  function joinPool(poolSlug) {
+    const pool = pools.find(p => p.slug === poolSlug);
+    const input = document.querySelector(`[data-cy="pool-contribution-input"][data-pool="${poolSlug}"]`);
+    const qty = parseInt(input.value, 10);
+
+    if (!qty || qty <= 0) {
+      showToast(`Enter a valid quantity to join the ${pool.name} pool.`, true);
+      return;
+    }
+
+    pool.current += qty;
+    renderPools();
+    showToast(`Added ${qty.toLocaleString()} ${pool.unit} to the ${pool.name} pool. New total: ${pool.current.toLocaleString()} / ${pool.moq.toLocaleString()}.`);
+  }
+
+  // ---------------------------------------------------------------------
+  // INTEGRATED FINTECH SOLUTIONS — financing state
+  // ---------------------------------------------------------------------
+  const financing = {
+    riff:  { limit: 250000, available: 250000 },
+    gates: { limit: 50000,  available: 50000 }
+  };
+
+  function renderFinancing() {
+    document.querySelector('[data-cy="riff-available-balance"]').textContent = `$${financing.riff.available.toLocaleString()}`;
+    document.querySelector('[data-cy="gates-fund-available-balance"]').textContent = `$${financing.gates.available.toLocaleString()}`;
+    document.getElementById('riff-usage-bar').style.width = `${100 - (financing.riff.available / financing.riff.limit) * 100}%`;
+    document.getElementById('gates-usage-bar').style.width = `${100 - (financing.gates.available / financing.gates.limit) * 100}%`;
+
+    const totalAvailable = financing.riff.available + financing.gates.available;
+    document.querySelector('[data-cy="metric-total-financing-value"]').textContent = `$${totalAvailable.toLocaleString()}`;
+  }
+
+  // ---------------------------------------------------------------------
+  // RFQ / PURCHASE ORDER FORM
+  // ---------------------------------------------------------------------
+  const rfqForm = document.getElementById('rfq-form');
+  const poolSelect = document.getElementById('rfq-pool-select');
+  const qtyInput = document.getElementById('rfq-quantity-input');
+  const facilitySelect = document.getElementById('financing-facility-select');
+  const orderValuePreview = document.getElementById('order-value-preview');
+  const matchingFundPreview = document.getElementById('matching-fund-preview');
+  const riffPreview = document.getElementById('riff-preview');
+
+  function currentOrderValue() {
+    const selectedOption = poolSelect.options[poolSelect.selectedIndex];
+    const price = selectedOption ? parseFloat(selectedOption.dataset.price || '0') : 0;
+    const qty = parseInt(qtyInput.value, 10) || 0;
+    return { price, qty, total: price * qty };
+  }
+
+  function updateOrderPreview() {
+    const { price, qty, total } = currentOrderValue();
+
+    if (price && qty) {
+      orderValuePreview.textContent = `Order value: ${qty.toLocaleString()} units x $${price.toFixed(2)} = $${total.toLocaleString(undefined,{maximumFractionDigits:2})}`;
+    } else {
+      orderValuePreview.textContent = 'Order value will be calculated once medicine and quantity are entered.';
+    }
+
+    // Financing facility preview
+    matchingFundPreview.classList.add('hidden');
+    riffPreview.classList.add('hidden');
+
+    if (facilitySelect.value === 'gates') {
+      matchingFundPreview.textContent = `Gates Foundation will match this purchase 1:1! Effective purchasing power doubled.${total ? ` ($${total.toLocaleString(undefined,{maximumFractionDigits:2})} matched, $${(total*2).toLocaleString(undefined,{maximumFractionDigits:2})} total purchasing power.)` : ''}`;
+      matchingFundPreview.classList.remove('hidden');
+    } else if (facilitySelect.value === 'riff') {
+      riffPreview.textContent = `Drawing from RIFF: $${financing.riff.available.toLocaleString()} currently available on this revolving line.`;
+      riffPreview.classList.remove('hidden');
+    }
+  }
+
+  [poolSelect, qtyInput, facilitySelect].forEach(el => el.addEventListener('input', updateOrderPreview));
+  facilitySelect.addEventListener('change', updateOrderPreview);
+
+  rfqForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const { total, qty } = currentOrderValue();
+    const poolLabel = poolSelect.options[poolSelect.selectedIndex]?.text || 'Unspecified medicine';
+    const facility = facilitySelect.value;
+
+    if (!qty || !poolSelect.value) {
+      showToast('Select a medicine pool and enter a valid quantity before submitting.', true);
+      return;
+    }
+
+    if (facility === 'riff') {
+      if (total > financing.riff.available) {
+        showToast(`RIFF balance insufficient: $${financing.riff.available.toLocaleString()} available, $${total.toLocaleString()} required.`, true);
+        return;
+      }
+      financing.riff.available -= total;
+    } else if (facility === 'gates') {
+      if (total > financing.gates.available) {
+        showToast(`Gates MNCH Fund balance insufficient: $${financing.gates.available.toLocaleString()} available.`, true);
+        return;
+      }
+      financing.gates.available -= total;
+    }
+
+    renderFinancing();
+    addRecentOrder({ poolLabel, qty, total, facility });
+
+    const facilityMsg = facility === 'gates'
+      ? 'financed via the Gates Foundation MNCH Matching Fund (1:1 matched)'
+      : facility === 'riff'
+        ? 'financed via the RIFF revolving credit line'
+        : 'submitted as a self-funded purchase order';
+
+    showToast(`RFQ for ${qty.toLocaleString()} units of ${poolLabel.split(' (')[0]} ${facilityMsg}.`);
+    rfqForm.reset();
+    updateOrderPreview();
+  });
+
+  function addRecentOrder({ poolLabel, qty, total, facility }) {
+    const list = document.getElementById('recent-orders-list');
+    const emptyState = document.querySelector('[data-cy="recent-orders-empty-state"]');
+    if (emptyState) emptyState.remove();
+
+    const facilityTag = facility === 'gates'
+      ? { text: 'Gates MNCH Match', classes: 'bg-amber-50 text-amber-700 border-amber-200' }
+      : facility === 'riff'
+        ? { text: 'RIFF', classes: 'bg-axnavy-50 text-axnavy-700 border-axnavy-200' }
+        : { text: 'Self-Funded', classes: 'bg-slate-50 text-slate-600 border-slate-200' };
+
+    const item = document.createElement('div');
+    item.className = 'border border-slate-100 rounded-lg p-3';
+    item.setAttribute('data-cy', 'recent-order-item');
+    item.innerHTML = `
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-medium text-slate-700">${poolLabel.split(' (')[0]}</p>
+        <span class="text-[10px] font-medium border px-2 py-0.5 rounded-full ${facilityTag.classes}">${facilityTag.text}</span>
+      </div>
+      <p class="text-xs text-slate-400 mt-1">${qty.toLocaleString()} units &middot; $${total.toLocaleString(undefined,{maximumFractionDigits:2})}</p>
+    `;
+    list.prepend(item);
+  }
+
+  // ---------------------------------------------------------------------
+  // END-TO-END LOGISTICS & COMPLIANCE DASHBOARD
+  // ---------------------------------------------------------------------
+  const milestones = ['Order Confirmed', 'In Transit', 'Customs Clearing', 'Delivered'];
+
+  const shipments = [
+    { id: 'SHP-2291', medicine: 'Oxytocin 10 IU/mL', temp: 2.4, tempStatus: 'STABLE', milestoneIndex: 1, compliance: 'approved', coldChain: true },
+    { id: 'SHP-2288', medicine: 'Rotavirus Vaccine', temp: 6.8, tempStatus: 'EXCURSION', milestoneIndex: 2, compliance: 'pending', coldChain: true },
+    { id: 'SHP-2276', medicine: 'Amoxicillin 250mg', temp: null, tempStatus: 'N/A', milestoneIndex: 0, compliance: 'approved', coldChain: false },
+    { id: 'SHP-2265', medicine: 'Oxytocin 10 IU/mL', temp: 3.1, tempStatus: 'STABLE', milestoneIndex: 3, compliance: 'approved', coldChain: true }
+  ];
+
+  function milestoneClasses(idx) {
+    if (idx === milestones.length - 1) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (idx === 0) return 'bg-slate-50 text-slate-600 border-slate-200';
+    return 'bg-axteal-50 text-axteal-700 border-axteal-200';
+  }
+
+  function complianceBadge(status) {
+    return status === 'approved'
+      ? { text: 'FDA Ghana Approved', classes: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
+      : { text: 'Pending FDA Clearance', classes: 'bg-amber-50 text-amber-700 border-amber-200 badge-pulse' };
+  }
+
+  function renderLogistics() {
+    const tbody = document.getElementById('logistics-tbody');
+    tbody.innerHTML = '';
+
+    shipments.forEach((s, i) => {
+      const compliance = complianceBadge(s.compliance);
+      const tempClasses = s.tempStatus === 'EXCURSION' ? 'bg-rose-50 text-rose-700 border-rose-200' : (s.tempStatus === 'STABLE' ? 'bg-axteal-50 text-axteal-700 border-axteal-200' : 'bg-slate-50 text-slate-500 border-slate-200');
+      const tempText = s.coldChain ? `${s.temp.toFixed(1)}°C - ${s.tempStatus}` : 'Ambient - N/A';
+      const isLast = s.milestoneIndex >= milestones.length - 1;
+
+      const tr = document.createElement('tr');
+      tr.className = 'border-b border-slate-50 last:border-0';
+      tr.setAttribute('data-cy', `shipment-row-${s.id}`);
+      tr.innerHTML = `
+        <td class="px-5 py-3">
+          <p class="font-medium text-slate-800 text-sm">${s.id}</p>
+          <p class="text-xs text-slate-400">${s.medicine}</p>
+        </td>
+        <td class="px-5 py-3">
+          <span class="text-xs font-medium border px-2 py-0.5 rounded-full ${tempClasses}" data-cy="logistics-temperature-status" data-shipment="${s.id}">${tempText}</span>
+        </td>
+        <td class="px-5 py-3">
+          <span class="text-xs font-medium border px-2 py-0.5 rounded-full ${milestoneClasses(s.milestoneIndex)}" data-cy="logistics-milestone" data-shipment="${s.id}">${milestones[s.milestoneIndex]}</span>
+        </td>
+        <td class="px-5 py-3">
+          <span class="text-xs font-medium border px-2 py-0.5 rounded-full ${compliance.classes}" data-cy="regulatory-compliance-status" data-shipment="${s.id}">${compliance.text}</span>
+        </td>
+        <td class="px-5 py-3">
+          <button class="text-xs font-medium text-axteal-700 hover:text-axteal-900 disabled:text-slate-300 disabled:cursor-not-allowed" data-cy="advance-milestone-btn" data-shipment="${s.id}" ${isLast ? 'disabled' : ''}>
+            ${isLast ? 'Delivered' : 'Advance →'}
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll('[data-cy="advance-milestone-btn"]').forEach(btn => {
+      btn.addEventListener('click', () => advanceMilestone(btn.dataset.shipment));
+    });
+
+    document.querySelector('[data-cy="metric-shipments-transit-value"]').textContent =
+      shipments.filter(s => s.milestoneIndex > 0 && s.milestoneIndex < milestones.length - 1).length;
+  }
+
+  function advanceMilestone(shipmentId) {
+    const s = shipments.find(sh => sh.id === shipmentId);
+    if (!s || s.milestoneIndex >= milestones.length - 1) return;
+    s.milestoneIndex += 1;
+
+    if (s.milestoneIndex === milestones.length - 1 && s.compliance === 'pending') {
+      s.compliance = 'approved';
+    }
+
+    renderLogistics();
+    showToast(`${s.id} advanced to "${milestones[s.milestoneIndex]}".`);
+  }
+
+  // ---------------------------------------------------------------------
+  // SUCCESS / ERROR TOAST
+  // ---------------------------------------------------------------------
+  let toastTimer = null;
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('success-toast');
+    const msgEl = document.getElementById('toast-message');
+    const box = toast.querySelector('div');
+
+    msgEl.textContent = message;
+    box.classList.toggle('bg-rose-600', isError);
+    box.classList.toggle('bg-slate-900', !isError);
+
+    toast.classList.remove('hidden');
+    toast.querySelector('div').classList.remove('toast-enter');
+    void toast.offsetWidth; // restart animation
+    toast.querySelector('div').classList.add('toast-enter');
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.add('hidden'), 3500);
+  }
+
+  // ---------------------------------------------------------------------
+  // INIT
+  // ---------------------------------------------------------------------
+  renderPools();
+  renderFinancing();
+  renderLogistics();
+  updateOrderPreview();
+</script>
+</body>
+</html>
